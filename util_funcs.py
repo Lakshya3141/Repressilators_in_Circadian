@@ -32,8 +32,8 @@ def activation(intermat):
 #@jit(nopython=True)
 def hill_fn(intermat,nodes,exp,hill=2):
     term = intermat.copy()
-    for i1,n1 in enumerate(nodes): #Source
-        for i2,n2 in enumerate(nodes): #Target
+    for i1 in range(np.shape(intermat)[0]): #Source
+        for i2 in range(np.shape(intermat)[1]): #Target
             if intermat[i1,i2] == 0.:
                 term[i1,i2] = 1
             elif intermat[i1,i2] == 1.:
@@ -54,4 +54,40 @@ def diff_eq(t,exp,intermat,alpha,beta,basal,hill,const=False,sig=1.0):
             #mRNA equation
             dydt[2*n] = -exp[2*n] + alpha[n]*term[n]
     return dydt
+    
+#@jit(nopython=True)
+def peak_finder(bool_peaks):
+    res = np.zeros(np.shape(bool_peaks),dtype=bool)
+    res = np.append(res,False)
+    peak = 0;
+    for n,val in enumerate(bool_peaks[:-1]):
+        if val == True and bool_peaks[n+1] == False: 
+            res[n-int(peak/2)] = True
+        elif val == True: peak = peak+1
+        else: peak = 0
+    return res[:-1]
+            
+#@jit(nopython=True)
+def slid_avg(times):
+    diff = []
+    for i in range(len(times)-1):
+        diff.append(times[i+1]-times[i])
+    return np.mean(diff)
+
+def amp_freq(data,time):
+    #plt.plot(time,data)
+    nlen = len(data)
+    data = data[int(nlen*0.2):]
+    time = time[int(nlen*0.2):]
+    maxi = np.max(data)
+    mini = np.min(data)
+    higher = data > 0.95*maxi
+    peaks = peak_finder(higher)
+    peak_times = time[peaks]
+    peak_vals = data[peaks]
+    avg_amp = np.mean(peak_vals)
+    avg_time = slid_avg(peak_times)
+    return(avg_amp,avg_time)
+
+
     

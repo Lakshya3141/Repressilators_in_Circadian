@@ -12,26 +12,77 @@ import scipy.integrate as scip
 from scipy.fftpack import fft, fftfreq
 global hill
 hill = 2
-"""
-if sys.argv[1]:
-    in_file = sys.argv[1] #Name of input
-else:
-    in_file = 'rep' #Or it takes in the default file 'rep'
-"""  
-in_file = 'resA_3'
+
+in_file = 'repC'
 nodes,intermat,alpha,beta,basal = uf.adjacency(in_file)
 init = np.random.rand(len(nodes)*2)*10
 #init = np.array([0,0,900,900])
 
-
+obs_node = 'C'
+ind = np.where(nodes == obs_node)
 
 t_fin = 100
 dt_max = 0.01
 steps = int(t_fin/dt_max)
 times = np.linspace(0,t_fin,steps)
-sol = scip.solve_ivp(uf.diff_eq, (0,t_fin), y0 = init, t_eval=times,
-                       args=(intermat,alpha,beta,basal,hill))
+evo,source = uf.evol_reader(np.array(intermat),nodes,'sig')
 
+exp_sig = np.linspace(10,10000,100)
+exp_sig = [10,100,1000]
+solutions = []
+cnt = 0
+
+for i,n in enumerate(evo[0:2]):
+    solutions.append([])
+    for e in exp_sig:
+        mat = pd.DataFrame(evo[i],columns=nodes,index=source)
+        sol = scip.solve_ivp(uf.diff_eq, (0,t_fin), y0 = init, t_eval=times,
+                       args=(mat,alpha,beta,basal,hill,True,e))
+        solutions[i].append(sol)
+        cnt = cnt+1
+        print("Done: ",cnt," out of ",len(evo)*len(exp_sig))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 for n,nod in enumerate(nodes):
     plt.plot(sol.t,sol.y[2*n],label='p'+nod)
     #plt.plot(sol.t,sol.y[2*n+1],label='m'+nod)
@@ -57,4 +108,4 @@ plt.xlabel('Frequency')
 
 periodicity = 1/sig_noise_freq[np.argmax(sig_noise_amp)]
 print(periodicity)
-
+'''

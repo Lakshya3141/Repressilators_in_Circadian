@@ -42,17 +42,19 @@ def hill_fn(intermat,nodes,exp,hill=2):
                 term[i1,i2] = 1/(1+exp[2*i1+1]**hill)
     return np.prod(term,axis=0)
 
-def diff_eq(t,exp,intermat,alpha,beta,basal,hill,const=False,sig=1.0):
+def diff_eq(t,exp,intermat,alpha,beta,basal,
+            hill,const=False,sig=1.0,name='sig'):
     #intermat = intermat.T[nodes!=sig].T[nodes!=sig]
     nodes = np.array(intermat.columns)
-    if const == False:
-        dydt = np.ones(len(nodes)*2)*sig
-        term = hill_fn(np.array(intermat),nodes,exp,hill)
-        for n,y in enumerate(nodes):
-            #Protein equation
-            dydt[2*n+1] = -beta[n]*(exp[2*n+1]-exp[2*n])
-            #mRNA equation
-            dydt[2*n] = -exp[2*n] + alpha[n]*term[n]
+    if const == True: 
+        exp = np.append(exp,[sig,sig])
+    dydt = np.ones(len(nodes)*2)
+    term = hill_fn(np.array(intermat),nodes,exp,hill)
+    for n,y in enumerate(nodes):
+        #Protein equation
+        dydt[2*n+1] = -beta[n]*(exp[2*n+1]-exp[2*n])
+        #mRNA equation
+        dydt[2*n] = -exp[2*n] + alpha[n]*term[n]
     return dydt
     
 #@jit(nopython=True)
@@ -88,6 +90,16 @@ def amp_freq(data,time):
     avg_amp = np.mean(peak_vals)
     avg_time = slid_avg(peak_times)
     return(avg_amp,avg_time)
-
-
+    
+def evol_reader(base,nodes,signal):
+    tot = 3**np.shape(base)[1]
+    res = []
+    for i in range(tot):
+        mat = np.copy(base)
+        app = np.array(list(np.base_repr(i,base=3)
+                            .zfill(np.shape(mat)[1]))
+                       ).astype(np.float64)
+        mat = np.append(mat,[app],axis=0)
+        res.append(mat)
+    return np.array(res),np.append(nodes,signal)
     

@@ -12,12 +12,7 @@ import scipy.integrate as scip
 from scipy.fftpack import fft, fftfreq
 global hill
 hill = 2
-"""
-if sys.argv[1]:
-    in_file = sys.argv[1] #Name of input
-else:
-    in_file = 'rep' #Or it takes in the default file 'rep'
-"""  
+
 in_file = 'resA_1'
 nodes,intermat,alpha,beta,basal = uf.adjacency(in_file)
 init = np.random.rand(len(nodes)*2)*10

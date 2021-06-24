@@ -20,13 +20,13 @@ import pickle as pk
 global hill
 hill = 2
 
-gen = False
+gen = True
 read = True
-img = False
+img = True
 ana = True
 img_freq = True
 
-in_file = 'repD'
+in_file = 'repC'
 
 # if not os.path.exists('./Output/{}'.format(in_file)):
 #     os.makedirs('./Output/{}'.format(in_file))
@@ -44,7 +44,7 @@ steps = int(t_fin/dt_max)
 times = np.linspace(0,t_fin,steps)
 evo,source = uf.evol_reader(np.array(intermat),nodes,'sig')
 
-exp_sig = np.linspace(10,2*max(alpha),100)
+exp_sig = np.linspace(0.01,10,100)
 cnt = 0
 
 if gen == True:
@@ -53,7 +53,7 @@ if gen == True:
         solutions.append([])
         series = []
         for e in exp_sig:
-            mat = pd.DataFrame(evo[i],columns=nodes,index=source)
+            mat = pd.DataFrame(n,columns=nodes,index=source)
             sol = scip.solve_ivp(uf.diff_eq, (0,t_fin), y0 = init, t_eval=times,
                            args=(mat,alpha,beta,basal,hill,True,e))
             solutions[i].append(sol.y[2*ind+1])
@@ -65,8 +65,8 @@ if gen == True:
         path = 'Output/{}/pert{}'.format(in_file,i)
         if not os.path.exists(path):
             os.makedirs(path)
-        df.to_excel('{}/data.xlsx'.format(path))
-    pk.dump(solutions, open('./Output/{}/bin.data'.format(in_file), 'wb'))
+        #df.to_excel('{}/data.xlsx'.format(path))
+    #pk.dump(solutions, open('./Output/{}/bin.data'.format(in_file), 'wb'))
         
 if read == True:
     solutions = pk.load(open('./Output/{}/bin.data'.format(in_file), 'rb'))

@@ -13,7 +13,7 @@ from scipy.fftpack import fft, fftfreq
 global hill
 hill = 2
 
-in_file = 'repD'
+in_file = 'quadRep'
 nodes,intermat,alpha,beta,basal = uf.adjacency(in_file)
 init = np.random.rand(len(nodes)*2)*10
 #init = np.array([0,0,900,900])

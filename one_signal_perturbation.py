@@ -26,7 +26,7 @@ img = True
 ana = True
 img_freq = True
 
-in_file = 'repC'
+in_file = 'repD'
 
 # if not os.path.exists('./Output/{}'.format(in_file)):
 #     os.makedirs('./Output/{}'.format(in_file))
@@ -45,6 +45,7 @@ times = np.linspace(0,t_fin,steps)
 evo,source = uf.evol_reader(np.array(intermat),nodes,'sig')
 
 exp_sig = np.linspace(0.01,10,100)
+exp_sig = [0.1,1,5,10,100]
 cnt = 0
 
 if gen == True:
@@ -66,13 +67,13 @@ if gen == True:
         if not os.path.exists(path):
             os.makedirs(path)
         #df.to_excel('{}/data.xlsx'.format(path))
-    #pk.dump(solutions, open('./Output/{}/bin.data'.format(in_file), 'wb'))
+    pk.dump(solutions, open('./Output/{}/bin.data'.format(in_file), 'wb'))
         
 if read == True:
     solutions = pk.load(open('./Output/{}/bin.data'.format(in_file), 'rb'))
 
 if img == True:
-    for e in [2,30,50,60,98]:
+    for e in range(len(exp_sig)):
     #for e in [2,30]:
         fig, axs = plt.subplots(3, 9)
         fig_ = plt.gcf()
@@ -80,8 +81,13 @@ if img == True:
         for i in range(len(evo)):
             axs[int(i/9), i%9].plot(times, solutions[i][e])
             axs[int(i/9), i%9].set_title(i)
-        fig.savefig('Output/{}/perts_{}'.format(in_file,int(exp_sig[e])))
-        plt.close()
+        fig.text(0.55, 0.07, 'time', ha='center',fontsize=24)
+        fig.text(0.55, 0.91, 'Expression profiles at signal levels: {}'.
+                 format(exp_sig[e]), ha='center',fontsize=36)
+        fig.text(0.09, 0.5, 'expression of A', va='center',
+                 rotation='vertical',fontsize=24)
+        fig.savefig('Output/{}/trial_{}'.format(in_file,int(exp_sig[e])))
+        plt.show()
 
 if ana == True:
     pers = []
@@ -104,6 +110,10 @@ if img_freq == True:
     for i in range(len(solutions)):
         axs[int(i/9), i%9].plot(exp_sig, pers[i])
         axs[int(i/9), i%9].set_title(i)
+    fig.text(0.55, 0.07, 'Signal levels', ha='center',fontsize=24)
+    fig.text(0.55, 0.91, 'Periodicity vs Signal levels', ha='center',fontsize=36)
+    fig.text(0.09, 0.5, 'Periodicity', va='center',
+             rotation='vertical',fontsize=24)
     fig.savefig('Output/{}/periodicity'.format(in_file))
     plt.show()
         
@@ -113,6 +123,10 @@ if img_freq == True:
     for i in range(len(solutions)):
         axs[int(i/9), i%9].plot(exp_sig, amps[i])
         axs[int(i/9), i%9].set_title(i)
+    fig.text(0.55, 0.07, 'Signal levels', ha='center',fontsize=24)
+    fig.text(0.55, 0.91, 'Amplitude vs Signal levels', ha='center',fontsize=36)
+    fig.text(0.09, 0.5, 'Amplitude', va='center',
+             rotation='vertical',fontsize=24)
     fig.savefig('Output/{}/amplitude'.format(in_file))
     plt.show()
         

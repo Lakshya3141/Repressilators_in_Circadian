@@ -48,7 +48,7 @@ def hill_fn(intermat,nodes,exp,hill=2):
                 term[i1,i2] = exp[2*i1+1]**hill/(1+exp[2*i1+1]**hill)
             elif intermat[i1,i2] == 2.:
                 term[i1,i2] = 1/(1+exp[2*i1+1]**hill)
-    # print(term[3])
+    #print(term)
     return np.prod(term,axis=0)
 
 def diff_eq(t,exp,intermat,alpha,beta,basal,

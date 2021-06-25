@@ -13,7 +13,7 @@ from scipy.fftpack import fft, fftfreq
 global hill
 hill = 2
 
-in_file = 'quadRep'
+in_file = 'repC'
 nodes,intermat,alpha,beta,basal = uf.adjacency(in_file)
 init = np.random.rand(len(nodes)*2)*10
 #init = np.array([0,0,900,900])
@@ -26,8 +26,9 @@ solutions = []
 amp = []
 per = []
 alp = np.linspace(1,20000,50)
+bet = np.linspace(0,100,50)
 for i in range(50):
-    alpha[0] = alp[i]
+    beta[0] = bet[i]
     sol = scip.solve_ivp(uf.diff_eq, (0,t_fin), y0 = init, t_eval=times,
                        args=(intermat,alpha,beta,basal,hill))
     a = []
@@ -41,14 +42,24 @@ for i in range(50):
     solutions.append(sol.y)
     print('done:',i)
 
+amp = np.array(amp).T
+per = np.array(per).T
 
 for i in range(3):
-    plt.plot(alp,a[i],label='p'+nodes[i])
-plt.title('amplitude vs production of A')
+    plt.plot(alp,amp[i],label='p'+nodes[i])
+plt.title('amplitude vs degradation of A')
 plt.legend()
-plt.xlabel('alpha')
+plt.xlabel('beta')
 plt.ylabel('amplitudes')
 
+
+
+for i in range(3):
+    plt.plot(alp,per[i],label='p'+nodes[i])
+plt.title('periodicity vs degradation of A')
+plt.legend()
+plt.xlabel('beta')
+plt.ylabel('period')
 # amp,per = uf.amp_freq(sol.y[0],sol.t)
 # for i in sol.y:
 #     print(uf.amp_freq(i,sol.t))
